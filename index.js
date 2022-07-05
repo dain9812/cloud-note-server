@@ -3,6 +3,8 @@ const fs = require("fs");
 
 const app = express();
 
+app.use(express.json());
+
 const data = JSON.parse(fs.readFileSync("data.json", "utf-8"));
 
 function save() {
@@ -23,7 +25,7 @@ app.get("/:id", (req, res) => {
     return;
   }
 
-  res.json(data);
+  res.json(data[id]);
 });
 
 app.delete("/:id", (req, res) => {
@@ -50,6 +52,55 @@ app.delete("/", (req, res) => {
   }
 
   res.json(data);
+
+  save();
+});
+
+app.post("/", (req, res) => {
+  const { content } = req.body;
+
+  if (!content || content.length === 0) {
+    res.status(400).json({
+      msg: "content가 올바르지 않습니다.",
+    });
+    return;
+  }
+
+  const memo = {
+    content,
+    created_at: Date.now(),
+    updated_at: null,
+    deleted_at: null,
+  };
+
+  data.push(memo);
+
+  res.json(memo);
+
+  save();
+});
+
+app.put("/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const { content } = req.body;
+
+  if (!content || content.length === 0) {
+    res.status(400).json({
+      msg: "content가 올바르지 않습니다.",
+    });
+    return;
+  }
+
+  if (isNaN(id) || data.length <= id || id < 0) {
+    res.status(400).json({
+      msg: "잘못된 id입니다.",
+    });
+    return;
+  }
+  data[id].updated_at = Date.now();
+  data[id].content = content;
+
+  res.json(data[id]);
 
   save();
 });
