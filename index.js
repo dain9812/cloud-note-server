@@ -68,13 +68,16 @@ app.delete("/:id", (req, res) => {
 });
 
 app.delete("/", (req, res) => {
+  const list = [];
+
   for (const memo of data) {
     if (memo.deleted_at === null) {
       memo.deleted_at = Date.now();
+      list.push(memo);
     }
   }
 
-  res.json(data);
+  res.json(list);
 
   save();
 });
