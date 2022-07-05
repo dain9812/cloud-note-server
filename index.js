@@ -3,6 +3,8 @@ const fs = require("fs");
 
 const app = express();
 
+let tmp = "";
+
 app.use(express.json());
 
 const data = JSON.parse(fs.readFileSync("data.json", "utf-8"));
@@ -13,6 +15,12 @@ function save() {
 
 app.get("/", (req, res) => {
   res.json(data.filter((d) => d.deleted_at === null));
+});
+
+app.get("/tmp", (req, res) => {
+  res.json({
+    rs: tmp,
+  });
 });
 
 app.get("/:id", (req, res) => {
@@ -69,6 +77,23 @@ app.delete("/", (req, res) => {
   res.json(data);
 
   save();
+});
+
+app.post("/tmp", (req, res) => {
+  const { content } = req.body;
+
+  if (!content || content.length === 0) {
+    res.status(400).json({
+      msg: "content가 올바르지 않습니다.",
+    });
+    return;
+  }
+
+  tmp = content;
+
+  res.json({
+    rs: true,
+  });
 });
 
 app.post("/", (req, res) => {
