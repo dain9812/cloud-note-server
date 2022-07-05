@@ -44,6 +44,14 @@ app.delete("/:id", (req, res) => {
     });
     return;
   }
+
+  if (data[id].deleted_at !== null) {
+    res.status(404).json({
+      msg: "이미 제거된 메모입니다.",
+    });
+    return;
+  }
+
   data[id].deleted_at = Date.now();
 
   res.json(data[id]);
