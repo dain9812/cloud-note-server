@@ -12,7 +12,7 @@ function save() {
 }
 
 app.get("/", (req, res) => {
-  res.json(data);
+  res.json(data.filter((d) => d.deleted_at === null));
 });
 
 app.get("/:id", (req, res) => {
@@ -21,6 +21,13 @@ app.get("/:id", (req, res) => {
   if (isNaN(id) || data.length <= id || id < 0) {
     res.status(400).json({
       msg: "잘못된 id입니다.",
+    });
+    return;
+  }
+
+  if (data[id].deleted_at !== null) {
+    res.status(404).json({
+      msg: "이미 제거된 메모입니다.",
     });
     return;
   }
@@ -97,6 +104,14 @@ app.put("/:id", (req, res) => {
     });
     return;
   }
+
+  if (data[id].deleted_at !== null) {
+    res.status(404).json({
+      msg: "이미 제거된 메모입니다.",
+    });
+    return;
+  }
+
   data[id].updated_at = Date.now();
   data[id].content = content;
 
