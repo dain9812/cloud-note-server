@@ -113,6 +113,7 @@ app.post("/", (req, res) => {
 
   const memo = {
     content,
+    id: data.length,
     created_at: Date.now(),
     updated_at: null,
     deleted_at: null,
